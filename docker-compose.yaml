@@ -27,6 +27,8 @@ services:
       MARIADB_USER: ${DB_USERNAME}
       SERVICE_TAGS: dev
       SERVICE_NAME: mariadb
+    env_file:
+      - ./.env
     volumes:
       - ./docker-compose/mariadb:/docker-entrypoint-initdb.d
     networks:
