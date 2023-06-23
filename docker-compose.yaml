@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  app:
+    build:
+      args:
+        user: sammy
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: myeventslara1
+    container_name: myeventslara1-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - myeventslara1
+
+  db:
+    image: mariadb:latest
+    container_name: myeventslara1-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mariadb
+    volumes:
+      - ./docker-compose/mariadb:/docker-entrypoint-initdb.d
+    networks:
+      - myeventslara1
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: myeventslara1-nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d
+    networks:
+      - myeventslara1
+
+networks:
+  myeventslara1:
+    driver: bridge
